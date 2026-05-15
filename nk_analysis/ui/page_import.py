@@ -24,7 +24,6 @@ BETON_CLASS_LIST = [
 ]
 
 class _ClickableLineEdit(QLineEdit):
-    """QLineEdit который открывает колбэк при клике."""
     def __init__(self, placeholder, on_click, parent=None):
         super().__init__(parent)
         self.setPlaceholderText(placeholder)
@@ -182,7 +181,6 @@ class ImportPage(QWidget):
         root.addWidget(bottom)
 
     def _pick_period(self):
-        """Диалог выбора периода обследования через два календаря."""
         dlg = QDialog(self)
         dlg.setWindowTitle("Выбор периода обследования")
         dlg.setMinimumWidth(520)

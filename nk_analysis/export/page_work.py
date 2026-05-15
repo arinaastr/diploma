@@ -34,6 +34,7 @@ def _render_chart(cal, title):
     return QPixmap.fromImage(img)
 
 def _cal_without_outliers(cal):
+    """Возвращает копию cal только с принятыми точками (без выбросов)."""
     df_clean = cal["df"][cal["mask"]].reset_index(drop=True)
     from nk_analysis.core.math_engine import build_calibration
     pairs_clean = df_clean.rename(columns={"V": "V", "f": "f"})[["V", "f"]]
@@ -66,7 +67,7 @@ class _CalibBlock(QWidget):
         stats_row = QHBoxLayout()
         for attr, caption in [("lbl_r2","R²"), ("lbl_r","r"), ("lbl_st","S_T, МПа"), ("lbl_cls","Класс бетона")]:
             card = QWidget()
-            card.setStyleSheet(f"background:{SURFACE};border:none;border-radius:8px;")
+            card.setStyleSheet(f"background:{SURFACE};border:1px solid {BORDER};border-radius:8px;")
             cl = QVBoxLayout(card)
             cl.setContentsMargins(10, 6, 10, 6)
             vl = QLabel("—")

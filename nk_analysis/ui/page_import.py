@@ -203,20 +203,20 @@ class ImportPage(QWidget):
         self._cal_start = QCalendarWidget()
         self._cal_start.setGridVisible(True)
         self._cal_start.setStyleSheet("""
-QCalendarWidget QWidget { background:
+QCalendarWidget QWidget { background: #FFFFFF; color: #1C2B4A; }
 QCalendarWidget QAbstractItemView {
-    background:
-    color:
-    selection-background-color:
-    selection-color:
+    background: #FFFFFF;
+    color: #1C2B4A;
+    selection-background-color: #1C2B4A;
+    selection-color: #FFFFFF;
     outline: 0;
 }
-QCalendarWidget QAbstractItemView:enabled { color:
-QCalendarWidget QAbstractItemView:disabled { color:
-QCalendarWidget QToolButton { color:
-QCalendarWidget QToolButton:hover { background:
-QCalendarWidget QMenu { background:#FFFFFF; color:#1C2B4A; }
-QCalendarWidget QSpinBox { color:#1C2B4A; background:#FFFFFF; font-size:13px; border:none; }
+QCalendarWidget QAbstractItemView:enabled { color: #1C2B4A; }
+QCalendarWidget QAbstractItemView:disabled { color: #B0BFCF; }
+QCalendarWidget QToolButton { color: #1C2B4A; background: transparent; font-size:13px; font-weight:600; padding:4px 8px; border:none; }
+QCalendarWidget QToolButton:hover { background: #F4F6FA; border-radius:4px; }
+QCalendarWidget QMenu { background: #FFFFFF; color: #1C2B4A; }
+QCalendarWidget QSpinBox { color: #1C2B4A; background: #FFFFFF; font-size:13px; border:none; }
 """)
         self._cal_start.setSelectedDate(QDate.currentDate().addMonths(-1).addDays(1 - QDate.currentDate().day()))
         start_block.addWidget(start_lbl)
@@ -235,20 +235,20 @@ QCalendarWidget QSpinBox { color:#1C2B4A; background:#FFFFFF; font-size:13px; bo
         self._cal_end = QCalendarWidget()
         self._cal_end.setGridVisible(True)
         self._cal_end.setStyleSheet("""
-QCalendarWidget QWidget { background:
+QCalendarWidget QWidget { background: #FFFFFF; color: #1C2B4A; }
 QCalendarWidget QAbstractItemView {
-    background:
-    color:
-    selection-background-color:
-    selection-color:
+    background: #FFFFFF;
+    color: #1C2B4A;
+    selection-background-color: #1C2B4A;
+    selection-color: #FFFFFF;
     outline: 0;
 }
-QCalendarWidget QAbstractItemView:enabled { color:
-QCalendarWidget QAbstractItemView:disabled { color:
-QCalendarWidget QToolButton { color:
-QCalendarWidget QToolButton:hover { background:
-QCalendarWidget QMenu { background:#FFFFFF; color:#1C2B4A; }
-QCalendarWidget QSpinBox { color:#1C2B4A; background:#FFFFFF; font-size:13px; border:none; }
+QCalendarWidget QAbstractItemView:enabled { color: #1C2B4A; }
+QCalendarWidget QAbstractItemView:disabled { color: #B0BFCF; }
+QCalendarWidget QToolButton { color: #1C2B4A; background: transparent; font-size:13px; font-weight:600; padding:4px 8px; border:none; }
+QCalendarWidget QToolButton:hover { background: #F4F6FA; border-radius:4px; }
+QCalendarWidget QMenu { background: #FFFFFF; color: #1C2B4A; }
+QCalendarWidget QSpinBox { color: #1C2B4A; background: #FFFFFF; font-size:13px; border:none; }
 """)
         self._cal_end.setSelectedDate(QDate.currentDate())
         end_block.addWidget(end_lbl)

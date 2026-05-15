@@ -15,12 +15,6 @@ def load_xlsx(path):
     return result
 
 def parse_stvol(df):
-    """
-    Разворачивает лист СТВОЛ.
-    Поддерживает два формата:
-    1. Колонки С_УК/В_УК/Ю_УК/З_УК (скорость) + С_МО/В_МО/Ю_МО/З_МО (прочность)
-    2. Произвольные колонки с V и f_МО
-    """
     records = []
     cols = [str(c) for c in df.columns]
 
@@ -74,12 +68,6 @@ def parse_stvol(df):
     return result
 
 def parse_ne_stvol(df):
-    """
-    Парсит лист НЕ_СТВОЛ.
-    Поддерживает форматы:
-    1. Колонки 'Скорость ультразвука' и 'Прочность МО'
-    2. Произвольные колонки с V и f_МО
-    """
     rename = {}
     for col in df.columns:
         cs = str(col).strip().lower()
@@ -102,7 +90,6 @@ def parse_ne_stvol(df):
     return result
 
 def extract_pairs(df):
-    """Выбирает строки с обоими значениями V и f_МО."""
     if df is None or len(df) == 0:
         return pd.DataFrame(columns=['V', 'f'])
     if 'V' not in df.columns or 'f_МО' not in df.columns:

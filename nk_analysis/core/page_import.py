@@ -1,3 +1,5 @@
+# Экран 1 — Импорт данных
+
 import os
 import pandas as pd
 
@@ -23,6 +25,7 @@ BETON_CLASS_LIST = [
     "B25","B27.5","B30","B35","B40","B45","B50","B60",
 ]
 
+
 class _ClickableLineEdit(QLineEdit):
     """QLineEdit который открывает колбэк при клике."""
     def __init__(self, placeholder, on_click, parent=None):
@@ -35,6 +38,7 @@ class _ClickableLineEdit(QLineEdit):
     def mousePressEvent(self, event):
         self._on_click()
 
+
 class ImportPage(QWidget):
 
     def __init__(self, state, on_next=None):
@@ -46,6 +50,7 @@ class ImportPage(QWidget):
         root.setContentsMargins(0, 0, 0, 0)
         root.setSpacing(0)
 
+        # ── Прокручиваемая область ──────────────────────────────────
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QScrollArea.Shape.NoFrame)
@@ -55,6 +60,7 @@ class ImportPage(QWidget):
         lay.setContentsMargins(28, 20, 28, 16)
         lay.setSpacing(10)
 
+        # Заголовок
         lay.addWidget(make_label("Импорт данных", big=True))
         lay.addWidget(make_label(
             "Загрузите .xlsx файлы. Данные «Ствол» и «Не ствол» обрабатываются раздельно.",
@@ -62,6 +68,7 @@ class ImportPage(QWidget):
         ))
         lay.addSpacing(4)
 
+        # ── Карточка загрузки файлов ────────────────────────────────
         file_card = QWidget()
         file_card.setStyleSheet(
             f"background:{SURFACE};border:none;border-radius:10px;"
@@ -72,6 +79,7 @@ class ImportPage(QWidget):
 
         fc_lay.addWidget(make_section_label("Файлы данных"))
 
+        # Синяя кнопка с иконкой (как в варианте 3)
         self.btn_load = QPushButton("  Выбрать файлы…")
         self.btn_load.setFixedHeight(38)
         self.btn_load.setStyleSheet(
@@ -91,12 +99,14 @@ class ImportPage(QWidget):
 
         lay.addWidget(file_card)
 
+        # ── Реквизиты объекта ───────────────────────────────────────
         lay.addWidget(make_section_label("Реквизиты объекта"))
 
         self.f_num    = QLineEdit(); self.f_num.setPlaceholderText("01/2026")
         self.f_obj    = QLineEdit(); self.f_obj.setPlaceholderText("Наименование объекта")
         self.f_addr   = QLineEdit(); self.f_addr.setPlaceholderText("Адрес")
         self.f_date   = QLineEdit(); self.f_date.setPlaceholderText("15.05.2026")
+        # Поле периода — клик открывает календарик
         self.f_period = _ClickableLineEdit("01.03.2026 – 31.03.2026", self._pick_period)
         self._period_widget = self.f_period
         self.f_dev    = QLineEdit(); self.f_dev.setPlaceholderText("Пульсар-1.1")
@@ -137,6 +147,7 @@ class ImportPage(QWidget):
         proj_row.addStretch()
         lay.addLayout(proj_row)
 
+        # ── Метрики ─────────────────────────────────────────────────
         lay.addSpacing(4)
         lay.addWidget(make_section_label("Данные в файлах"))
         mrow = QHBoxLayout(); mrow.setSpacing(8)
@@ -148,6 +159,7 @@ class ImportPage(QWidget):
             mrow.addWidget(m)
         lay.addLayout(mrow)
 
+        # ── Предпросмотр ─────────────────────────────────────────────
         lay.addSpacing(4)
         lay.addWidget(make_section_label("Предпросмотр данных"))
         tabs = QTabWidget()
@@ -163,6 +175,7 @@ class ImportPage(QWidget):
         scroll.setWidget(inner)
         root.addWidget(scroll, stretch=1)
 
+        # ── Нижняя панель ────────────────────────────────────────────
         bottom = QWidget()
         bottom.setFixedHeight(54)
         bottom.setStyleSheet(
@@ -180,6 +193,8 @@ class ImportPage(QWidget):
         btn_next.clicked.connect(self._go_next)
         bl.addWidget(btn_next)
         root.addWidget(bottom)
+
+    # ── Логика ──────────────────────────────────────────────────────
 
     def _pick_period(self):
         """Диалог выбора периода обследования через два календаря."""
@@ -199,26 +214,28 @@ class ImportPage(QWidget):
         cals_row = QHBoxLayout()
         cals_row.setSpacing(16)
 
+        # Начало
         start_block = QVBoxLayout()
         start_lbl = QLabel("Начало периода")
         start_lbl.setStyleSheet("font-size:11px;color:#7A90AA;font-weight:600;text-transform:uppercase;")
         self._cal_start = QCalendarWidget()
         self._cal_start.setGridVisible(True)
         self._cal_start.setStyleSheet("""
-QCalendarWidget QWidget { background:
+QCalendarWidget QWidget { background: #FFFFFF; color: #1C2B4A; }
 QCalendarWidget QAbstractItemView {
-    background:
-    color:
-    selection-background-color:
-    selection-color:
+    background: #FFFFFF;
+    color: #1C2B4A;
+    selection-background-color: #1C2B4A;
+    selection-color: #FFFFFF;
     outline: 0;
 }
-QCalendarWidget QAbstractItemView:enabled { color:
-QCalendarWidget QAbstractItemView:disabled { color:
-QCalendarWidget QToolButton { color:
-QCalendarWidget QToolButton:hover { background:
+QCalendarWidget QAbstractItemView:enabled { color: #1C2B4A; }
+QCalendarWidget QAbstractItemView:disabled { color: #B0BFCF; }
+QCalendarWidget QToolButton { color: #1C2B4A; background: transparent; font-size:13px; font-weight:600; padding:4px 8px; border:none; }
+QCalendarWidget QToolButton:hover { background: #F4F6FA; border-radius:4px; }
 QCalendarWidget QMenu { background:#FFFFFF; color:#1C2B4A; }
 QCalendarWidget QSpinBox { color:#1C2B4A; background:#FFFFFF; font-size:13px; border:none; }
+#qt_calendar_navigationbar { background:#F4F6FA; border-bottom:1px solid #DDE5F0; padding:4px; }
 """)
         self._cal_start.setSelectedDate(QDate.currentDate().addMonths(-1).addDays(1 - QDate.currentDate().day()))
         start_block.addWidget(start_lbl)
@@ -231,26 +248,28 @@ QCalendarWidget QSpinBox { color:#1C2B4A; background:#FFFFFF; font-size:13px; bo
         self._cal_start.setPalette(_pal)
         start_block.addWidget(self._cal_start)
 
+        # Конец
         end_block = QVBoxLayout()
         end_lbl = QLabel("Конец периода")
         end_lbl.setStyleSheet("font-size:11px;color:#7A90AA;font-weight:600;text-transform:uppercase;")
         self._cal_end = QCalendarWidget()
         self._cal_end.setGridVisible(True)
         self._cal_end.setStyleSheet("""
-QCalendarWidget QWidget { background:
+QCalendarWidget QWidget { background: #FFFFFF; color: #1C2B4A; }
 QCalendarWidget QAbstractItemView {
-    background:
-    color:
-    selection-background-color:
-    selection-color:
+    background: #FFFFFF;
+    color: #1C2B4A;
+    selection-background-color: #1C2B4A;
+    selection-color: #FFFFFF;
     outline: 0;
 }
-QCalendarWidget QAbstractItemView:enabled { color:
-QCalendarWidget QAbstractItemView:disabled { color:
-QCalendarWidget QToolButton { color:
-QCalendarWidget QToolButton:hover { background:
+QCalendarWidget QAbstractItemView:enabled { color: #1C2B4A; }
+QCalendarWidget QAbstractItemView:disabled { color: #B0BFCF; }
+QCalendarWidget QToolButton { color: #1C2B4A; background: transparent; font-size:13px; font-weight:600; padding:4px 8px; border:none; }
+QCalendarWidget QToolButton:hover { background: #F4F6FA; border-radius:4px; }
 QCalendarWidget QMenu { background:#FFFFFF; color:#1C2B4A; }
 QCalendarWidget QSpinBox { color:#1C2B4A; background:#FFFFFF; font-size:13px; border:none; }
+#qt_calendar_navigationbar { background:#F4F6FA; border-bottom:1px solid #DDE5F0; padding:4px; }
 """)
         self._cal_end.setSelectedDate(QDate.currentDate())
         end_block.addWidget(end_lbl)
@@ -305,7 +324,7 @@ QCalendarWidget QSpinBox { color:#1C2B4A; background:#FFFFFF; font-size:13px; bo
         self.state["pairs_ne"]    = pn
 
         names = ", ".join(os.path.basename(p) for p in paths)
-        self.lbl_files.setText(f"  {names}")
+        self.lbl_files.setText(f"✓  {names}")
         self.lbl_files.setStyleSheet(
             f"color:{OK_FG};font-size:12px;background:transparent;font-weight:500;"
         )

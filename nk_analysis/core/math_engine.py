@@ -1,6 +1,3 @@
-# Математика: регрессия МНК, отбраковка выбросов 2*S_T,
-# класс бетона, классификация прочности — по ГОСТ 17624-2021
-
 import numpy as np
 import pandas as pd
 
@@ -9,7 +6,6 @@ from nk_analysis.utils.constants import (
     MAX_ITERATIONS, MIN_PAIRS,
     OK_BG, OK_FG, WRN_BG, WRN_FG, BAD_BG, BAD_FG,
 )
-
 
 def build_calibration(pairs):
     """Строит регрессию f = a0 + a1*V с отбраковкой выбросов.
@@ -75,7 +71,6 @@ def build_calibration(pairs):
     return {"a0": a0, "a1": a1, "S_T": s_t, "R2": r2, "r": r_corr,
             "mask": mask, "iters": iterations, "df": df}
 
-
 def get_beton_class(avg_strength):
     """Класс бетона по средней прочности (ГОСТ 18105-2018)."""
     if avg_strength is None or (isinstance(avg_strength, float) and np.isnan(avg_strength)):
@@ -84,7 +79,6 @@ def get_beton_class(avg_strength):
         if avg_strength <= limit * 1.15:
             return cls
     return "B60+"
-
 
 def classify_strength(f_mpa):
     """Цвет/статус одной точки прочности."""
@@ -95,7 +89,6 @@ def classify_strength(f_mpa):
     if f_mpa >= THRESHOLD_WARN:
         return "Внимание", WRN_BG, WRN_FG
     return "Критично", BAD_BG, BAD_FG
-
 
 def calculate_strength(df, a0, a1):
     """Добавляет к df колонки: f_расч МПа, Класс, Статус.

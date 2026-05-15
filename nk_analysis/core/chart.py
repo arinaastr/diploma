@@ -1,11 +1,8 @@
-# Построение графика: точки, регрессия, полоса ±2*S_T
-
 import os
 import tempfile
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-
 
 def draw_scatter(ax, fig, cal, title="Градуировочная зависимость"):
     """Рисует график на переданном ax."""
@@ -38,14 +35,12 @@ def draw_scatter(ax, fig, cal, title="Градуировочная зависи�
     ax.grid(True, alpha=0.3)
     fig.tight_layout()
 
-
 def save_chart_to_temp(fig):
     """Сохраняет фигуру во временный PNG, возвращает путь."""
     fd, path = tempfile.mkstemp(suffix=".png")
     os.close(fd)
     fig.savefig(path, dpi=150, bbox_inches="tight")
     return path
-
 
 def cleanup_temp(path):
     """Удаляет временный файл."""

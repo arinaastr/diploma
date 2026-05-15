@@ -1,20 +1,21 @@
-# Константы приложения: цвета интерфейса, таблица классов бетона, пороги
+NAVY    = "#1C2B4A"
+BLUE    = "#3A7BD5"
+WHITE   = "#FFFFFF"
+BG      = "#FFFFFF"
+SURFACE = "#F5F8FC"
+BORDER  = "#DDE5F0"
+MUTED   = "#7A90AA"
+TEXT_COLOR = "#1C2B4A"
 
-# --- Палитра ---
-CREAM  = "#EEE8DF"
-BEIGE  = "#C4BCB0"
-OCEAN  = "#2C365A"
-WHITE  = "#FDFAF6"
-MUTED  = "#7a7260"
-BORDER = "#d4cdc4"
-TEXT_COLOR = "#2C365A"
+CREAM  = BG
+BEIGE  = BORDER
+OCEAN  = NAVY
+BORDER = BORDER
 
-# Цвета статусов
-OK_BG  = "#dde8d4";  OK_FG  = "#2d5a1a"
-WRN_BG = "#f5ead0";  WRN_FG = "#7a4a0a"
-BAD_BG = "#f5d8d8";  BAD_FG = "#7a1a1a"
+OK_BG  = "#E6F4EC";  OK_FG  = "#1E6B3C"
+WRN_BG = "#FEF3E2";  WRN_FG = "#7A4F00"
+BAD_BG = "#FDECEA";  BAD_FG = "#8B1A1A"
 
-# Таблица классов бетона (ГОСТ 18105-2018)
 BETON_CLASSES = [
     ( 7.5, "B5"),    (10.0, "B7.5"),  (15.0, "B10"),
     (18.5, "B12.5"), (22.0, "B15"),   (25.5, "B17.5"),
@@ -24,10 +25,8 @@ BETON_CLASSES = [
     (88.0, "B60"),
 ]
 
-# Пороги МПа
 THRESHOLD_OK   = 30.0
 THRESHOLD_WARN = 20.0
 
-# Ограничения алгоритма
 MAX_ITERATIONS = 10
 MIN_PAIRS      = 3

@@ -1,5 +1,3 @@
-# Экран 2 — Расчёт: регрессия, графики, таблицы прочностей
-
 import io
 import copy
 import numpy as np
@@ -15,14 +13,15 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtGui import QPixmap, QImage
 from PyQt6.QtCore import Qt
 
-from nk_analysis.utils.constants import CREAM, OCEAN, WHITE, MUTED, BORDER, MIN_PAIRS
+from nk_analysis.utils.constants import NAVY, BLUE, WHITE, SURFACE, BORDER, MUTED, MIN_PAIRS
+OCEAN = NAVY
+CREAM = WHITE
 from nk_analysis.core.math_engine import build_calibration, calculate_strength, get_beton_class
 from nk_analysis.core.chart import draw_scatter
 from nk_analysis.ui.styles import make_label, make_section_label, setup_table, fill_table
 from nk_analysis.ui.widgets import BottomBar
 
 BTN = "background:#2C365A;color:#EEE8DF;font-weight:600;border-radius:4px;font-size:12px;border:none;padding:6px 18px;"
-
 
 def _render_chart(cal, title):
     fig, ax = plt.subplots(figsize=(9, 4))
@@ -34,16 +33,13 @@ def _render_chart(cal, title):
     img = QImage.fromData(buf.read())
     return QPixmap.fromImage(img)
 
-
 def _cal_without_outliers(cal):
     """Возвращает копию cal только с принятыми точками (без выбросов)."""
     df_clean = cal["df"][cal["mask"]].reset_index(drop=True)
-    # Пересчитываем регрессию без выбросов (одна итерация, выбросов нет)
     from nk_analysis.core.math_engine import build_calibration
     pairs_clean = df_clean.rename(columns={"V": "V", "f": "f"})[["V", "f"]]
     cal_clean = build_calibration(pairs_clean)
     return cal_clean if cal_clean else cal
-
 
 class _CalibBlock(QWidget):
 
@@ -53,7 +49,7 @@ class _CalibBlock(QWidget):
         self._state         = state
         self._state_key_cal = state_key_cal
         self._state_key_dc  = state_key_dc
-        self._cal_original  = None   # с выбросами
+        self._cal_original  = None
         self._df_full       = None
         self._data_cols     = None
         self._title         = None
@@ -68,11 +64,10 @@ class _CalibBlock(QWidget):
         self.lbl_formula.setStyleSheet("font-size:13px;font-family:monospace;background:transparent;")
         lay.addWidget(self.lbl_formula)
 
-        # Статистика
         stats_row = QHBoxLayout()
         for attr, caption in [("lbl_r2","R²"), ("lbl_r","r"), ("lbl_st","S_T, МПа"), ("lbl_cls","Класс бетона")]:
             card = QWidget()
-            card.setStyleSheet(f"background:{CREAM};border:1px solid {BORDER};border-radius:5px;")
+            card.setStyleSheet(f"background:{SURFACE};border:1px solid {BORDER};border-radius:8px;")
             cl = QVBoxLayout(card)
             cl.setContentsMargins(10, 6, 10, 6)
             vl = QLabel("—")
@@ -84,26 +79,22 @@ class _CalibBlock(QWidget):
             stats_row.addWidget(card)
         lay.addLayout(stats_row)
 
-        # Чекбокс выбросов
-        self.chk_outliers = QCheckBox("Убрать выбросы (пересчитать без них)")
+        self.chk_outliers = CheckBox("Убрать выбросы (пересчитать без них)")
         self.chk_outliers.setStyleSheet("font-size:12px;background:transparent;")
         self.chk_outliers.stateChanged.connect(self._on_outlier_toggle)
         lay.addWidget(self.chk_outliers)
 
-        # График
         self.lbl_chart = QLabel()
         self.lbl_chart.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.lbl_chart.setMinimumHeight(260)
         lay.addWidget(self.lbl_chart)
 
-        # Итерации
         lay.addWidget(make_section_label("Итерации отбраковки"))
         self.tbl_iters = QTableWidget()
         self.tbl_iters.setMaximumHeight(120)
         setup_table(self.tbl_iters)
         lay.addWidget(self.tbl_iters)
 
-        # Прочности
         lay.addWidget(make_section_label("Прочность по элементам"))
         self.tbl_data = QTableWidget()
         self.tbl_data.setMinimumHeight(180)
@@ -122,7 +113,6 @@ class _CalibBlock(QWidget):
             cal = _cal_without_outliers(self._cal_original)
         else:
             cal = self._cal_original
-        # Обновляем state — чтобы при сохранении использовался нужный вариант
         self._state[self._state_key_cal] = cal
         if self._df_full is not None and len(self._df_full):
             self._state[self._state_key_dc] = calculate_strength(
@@ -170,7 +160,6 @@ class _CalibBlock(QWidget):
         self.lbl_no_data.setVisible(False)
         self._display(cal)
 
-
 class WorkPage(QWidget):
 
     def __init__(self, state, on_back=None, on_next=None):
@@ -186,7 +175,7 @@ class WorkPage(QWidget):
         scroll.setFrameShape(QScrollArea.Shape.NoFrame)
 
         inner = QWidget()
-        inner.setStyleSheet(f"background:{CREAM};")
+        inner.setStyleSheet(f"background:{WHITE};")
         lay = QVBoxLayout(inner)
         lay.setContentsMargins(24, 16, 24, 12)
         lay.setSpacing(12)

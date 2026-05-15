@@ -1,5 +1,3 @@
-# Экран 3 — Выгрузка отчёта в DOCX
-
 import os
 import shutil
 
@@ -11,8 +9,9 @@ from PyQt6.QtWidgets import (
 from nk_analysis.ui.styles import make_label, make_section_label, make_field_label
 from nk_analysis.ui.widgets import BottomBar
 from nk_analysis.export.docx_report import generate_docx
-from nk_analysis.utils.constants import CREAM, OCEAN, WHITE, MUTED, BORDER, OK_FG
-
+from nk_analysis.utils.constants import NAVY, WHITE, SURFACE, BORDER, MUTED, OK_FG
+OCEAN = NAVY
+CREAM = WHITE
 
 class ExportPage(QWidget):
 
@@ -29,7 +28,7 @@ class ExportPage(QWidget):
         scroll.setFrameShape(QScrollArea.Shape.NoFrame)
 
         inner = QWidget()
-        inner.setStyleSheet(f"background:{CREAM};")
+        inner.setStyleSheet(f"background:{WHITE};")
         lay = QVBoxLayout(inner)
         lay.setContentsMargins(28, 16, 28, 12)
         lay.setSpacing(10)
@@ -37,7 +36,6 @@ class ExportPage(QWidget):
         lay.addWidget(make_label("Выгрузка протокола", big=True))
         lay.addWidget(make_label("Настройте содержимое протокола и сохраните DOCX.", muted=True))
 
-        # --- Исполнители ---
         lay.addWidget(make_section_label("Исполнители"))
 
         def row(label, widget):
@@ -57,11 +55,10 @@ class ExportPage(QWidget):
         row("Исполнитель 2, ФИО",       self.f_e2f)
         row("Исполнитель 2, должность", self.f_e2p)
 
-        # --- Содержимое ---
         lay.addWidget(make_section_label("Содержимое протокола"))
-        self.chk_chart  = QCheckBox("Включить графики")
-        self.chk_stvol  = QCheckBox("Результаты по стволу")
-        self.chk_ne     = QCheckBox("Результаты по конструкциям (не ствол)")
+        self.chk_chart  = CheckBox("Включить графики")
+        self.chk_stvol  = CheckBox("Результаты по стволу")
+        self.chk_ne     = CheckBox("Результаты по конструкциям (не ствол)")
         self.chk_chart.setChecked(True)
         self.chk_stvol.setChecked(True)
         self.chk_ne.setChecked(True)
@@ -69,7 +66,6 @@ class ExportPage(QWidget):
         lay.addWidget(self.chk_stvol)
         lay.addWidget(self.chk_ne)
 
-        # --- Кнопка ---
         lay.addWidget(make_section_label("Сохранить"))
         btn_save = QPushButton("Сохранить протокол DOCX…")
         btn_save.setFixedWidth(260)
@@ -111,7 +107,7 @@ class ExportPage(QWidget):
                 include_ne=self.chk_ne.isChecked(),
             )
             shutil.move(tmp, path)
-            self.lbl_status.setText(f"✓ Сохранено: {os.path.basename(path)}")
+            self.lbl_status.setText(f" Сохранено: {os.path.basename(path)}")
             self.lbl_status.setStyleSheet(f"font-size:12px;color:{OK_FG};background:transparent;")
             import subprocess, sys
             if sys.platform == "win32":

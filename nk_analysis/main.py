@@ -1,5 +1,3 @@
-# Главное окно приложения НК Анализ
-
 import sys
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QWidget,
@@ -9,7 +7,6 @@ from PyQt6.QtWidgets import (
 from nk_analysis.utils.constants import OCEAN, CREAM, BEIGE
 from nk_analysis.ui import ImportPage, WorkPage, ExportPage, StepBar, QSS
 
-
 class App(QMainWindow):
 
     def __init__(self):
@@ -17,6 +14,14 @@ class App(QMainWindow):
         self.setWindowTitle("НК Анализ — Прочность бетонной крепи")
         self.setMinimumSize(1000, 660)
         self.resize(1200, 800)
+        from PyQt6.QtCore import Qt as _Qt
+        self.setWindowFlags(
+            _Qt.WindowType.Window |
+            _Qt.WindowType.CustomizeWindowHint |
+            _Qt.WindowType.WindowMinimizeButtonHint |
+            _Qt.WindowType.WindowMaximizeButtonHint |
+            _Qt.WindowType.WindowCloseButtonHint
+        )
         self.state = {}
 
         cw = QWidget()
@@ -25,7 +30,6 @@ class App(QMainWindow):
         ml.setContentsMargins(0, 0, 0, 0)
         ml.setSpacing(0)
 
-        # Заголовок
         hdr = QWidget()
         hdr.setStyleSheet(f"background:{OCEAN};")
         hdr.setFixedHeight(40)
@@ -38,11 +42,9 @@ class App(QMainWindow):
         hl.addWidget(t); hl.addSpacing(16); hl.addWidget(s); hl.addStretch()
         ml.addWidget(hdr)
 
-        # Шкала шагов
         self.step_bar = StepBar()
         ml.addWidget(self.step_bar)
 
-        # Стек экранов
         self.stack = QStackedWidget()
         ml.addWidget(self.stack, stretch=1)
 
@@ -58,8 +60,6 @@ class App(QMainWindow):
 
         self._show(0)
 
-    # --- навигация ---
-
     def _show(self, idx):
         self.stack.setCurrentIndex(idx)
         self.step_bar.set_step(idx)
@@ -74,14 +74,12 @@ class App(QMainWindow):
     def _to_export(self):
         self._show(2)
 
-
 def main():
     app = QApplication(sys.argv)
     app.setStyleSheet(QSS)
     win = App()
     win.show()
     sys.exit(app.exec())
-
 
 if __name__ == "__main__":
     main()

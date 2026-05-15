@@ -1,5 +1,3 @@
-# Генерация протокола DOCX по ГОСТ 17624-2021
-
 import os
 import tempfile
 import numpy as np
@@ -17,7 +15,6 @@ from docx.oxml import OxmlElement
 from nk_analysis.core.chart import draw_scatter, save_chart_to_temp, cleanup_temp
 from nk_analysis.core.math_engine import get_beton_class
 
-
 def _heading(doc, text, level=1):
     p = doc.add_paragraph(text)
     run = p.runs[0]
@@ -26,7 +23,6 @@ def _heading(doc, text, level=1):
     p.paragraph_format.space_before = Pt(6)
     p.paragraph_format.space_after  = Pt(3)
     return p
-
 
 def _add_table(doc, df, cols=None):
     if df is None or len(df) == 0:
@@ -48,7 +44,6 @@ def _add_table(doc, df, cols=None):
             cells[i].text = "—" if (val is None or (isinstance(val, float) and np.isnan(val))) else str(val)
     doc.add_paragraph("")
 
-
 def generate_docx(state, meta, include_chart=True,
                   include_stvol=True, include_ne=True):
     """Генерирует Word-протокол.
@@ -63,14 +58,12 @@ def generate_docx(state, meta, include_chart=True,
     """
     doc = Document()
 
-    # --- Поля страницы ---
     section = doc.sections[0]
     section.left_margin   = Cm(2.5)
     section.right_margin  = Cm(1.5)
     section.top_margin    = Cm(2.0)
     section.bottom_margin = Cm(2.0)
 
-    # --- Заголовок ---
     title = doc.add_paragraph("ПРОТОКОЛ")
     title.alignment = WD_ALIGN_PARAGRAPH.CENTER
     title.runs[0].bold = True
@@ -84,7 +77,6 @@ def generate_docx(state, meta, include_chart=True,
 
     doc.add_paragraph(f"№ {meta.get('num', '—')}  от  {meta.get('date', '—')}")
 
-    # --- Общие сведения ---
     _heading(doc, "1. Общие сведения")
     info = [
         ("Объект",              meta.get("obj",    "—")),
@@ -102,7 +94,6 @@ def generate_docx(state, meta, include_chart=True,
         tbl.rows[i].cells[1].text = v
     doc.add_paragraph("")
 
-    # --- Результаты по СТВОЛУ ---
     if include_stvol:
         _heading(doc, "2. Результаты по стволу")
         cal_s = state.get("cal_s")
@@ -113,11 +104,9 @@ def generate_docx(state, meta, include_chart=True,
             doc.add_paragraph(
                 f"R² = {cal_s['R2']:.4f},  r = {cal_s['r']:.4f},  S_T = {cal_s['S_T']:.3f} МПа"
             )
-            # Таблица итераций
             if cal_s["iters"]:
                 _heading(doc, "Итерации отбраковки (ствол)", level=2)
                 _add_table(doc, pd.DataFrame(cal_s["iters"]))
-            # График
             if include_chart:
                 fig, ax = plt.subplots(figsize=(14, 5))
                 draw_scatter(ax, fig, cal_s, title="Градуировочная зависимость — Ствол")
@@ -128,14 +117,12 @@ def generate_docx(state, meta, include_chart=True,
                 finally:
                     cleanup_temp(tmp)
                 doc.add_paragraph("")
-        # Таблица прочностей
         dc_s = state.get("dc_stvol", pd.DataFrame())
         if len(dc_s):
             _heading(doc, "Данные по стволу", level=2)
             cols_s = [c for c in ["Горизонт", "Сторона", "V", "f_МО", "f_расч МПа", "Класс", "Статус"] if c in dc_s.columns]
             _add_table(doc, dc_s, cols_s)
 
-    # --- Результаты по НЕ СТВОЛУ ---
     if include_ne:
         _heading(doc, "3. Результаты по конструкциям (не ствол)")
         cal_n = state.get("cal_n")
@@ -165,10 +152,8 @@ def generate_docx(state, meta, include_chart=True,
             cols_n = [c for c in ["Участок", "V", "f_МО", "f_расч МПа", "Класс", "Статус"] if c in dc_n.columns]
             _add_table(doc, dc_n, cols_n)
 
-    # --- Заключение ---
     _heading(doc, "4. Заключение")
 
-    # Вычислить фактический класс
     frames = []
     dc_s = state.get("dc_stvol", pd.DataFrame())
     dc_n = state.get("dc_ne",    pd.DataFrame())
@@ -191,24 +176,29 @@ def generate_docx(state, meta, include_chart=True,
     doc.add_paragraph(f"Фактический класс бетона:   {fact_cls}")
     doc.add_paragraph(f"Проектный класс бетона:     {proj_cls}")
 
-    if fact_cls != "—" and proj_cls and proj_cls != "—":
-        if fact_cls == proj_cls:
-            verdict = "Фактический класс бетона СООТВЕТСТВУЕТ проектному."
+    if fact_cls != "—":
+        if proj_cls and proj_cls not in ("—", "", "— не указан —"):
+            if fact_cls == proj_cls:
+                verdict = f"Фактический класс бетона СООТВЕТСТВУЕТ проектному ({proj_cls})."
+            else:
+                verdict = f"Фактический класс бетона НЕ СООТВЕТСТВУЕТ проектному ({fact_cls} ≠ {proj_cls})."
         else:
-            verdict = f"Фактический класс бетона НЕ СООТВЕТСТВУЕТ проектному ({fact_cls} ≠ {proj_cls})."
+            verdict = f"По результатам обследования бетон имеет класс {fact_cls} (средняя прочность {rm_str} МПа)."
         p = doc.add_paragraph(verdict)
         p.runs[0].bold = True
 
-    # --- Подписи ---
     _heading(doc, "5. Исполнители")
     sign_tbl = doc.add_table(rows=2, cols=2)
     sign_tbl.style = "Table Grid"
-    sign_tbl.rows[0].cells[0].text = f"Исп. 1: {meta.get('e1f','—')} ({meta.get('e1p','—')})"
-    sign_tbl.rows[1].cells[0].text = f"Исп. 2: {meta.get('e2f','—')} ({meta.get('e2p','—')})"
+    e1f = meta.get('e1f','') or '—'
+    e1p = meta.get('e1p','') or ''
+    e2f = meta.get('e2f','') or '—'
+    e2p = meta.get('e2p','') or ''
+    sign_tbl.rows[0].cells[0].text = f"Исп. 1: {e1f}" + (f", {e1p}" if e1p else "")
+    sign_tbl.rows[1].cells[0].text = f"Исп. 2: {e2f}" + (f", {e2p}" if e2p else "")
     sign_tbl.rows[0].cells[1].text = "Подпись: ____________"
     sign_tbl.rows[1].cells[1].text = "Подпись: ____________"
 
-    # Сохранить во временный файл
     fd, path = tempfile.mkstemp(suffix=".docx")
     os.close(fd)
     doc.save(path)

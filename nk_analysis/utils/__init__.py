@@ -1,1 +1,1 @@
-# Пакет НК Анализ
+from .constants import *

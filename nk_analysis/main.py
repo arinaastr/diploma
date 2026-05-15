@@ -12,6 +12,11 @@ class App(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("НК Анализ — Прочность бетонной крепи")
+        import os as _os
+        from PyQt6.QtGui import QIcon as _QIcon
+        _ico = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), '..', 'nk_analysis.ico')
+        if _os.path.exists(_ico):
+            self.setWindowIcon(_QIcon(_ico))
         self.setMinimumSize(1000, 660)
         self.resize(1200, 800)
         from PyQt6.QtCore import Qt as _Qt

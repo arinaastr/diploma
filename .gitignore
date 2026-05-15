@@ -1,0 +1,9 @@
+﻿dist/
+build/
+*.exe
+*.pkg
+*.spec
+__pycache__/
+*.pyc
+*.pyo
+.env

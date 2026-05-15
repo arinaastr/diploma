@@ -34,7 +34,6 @@ def _render_chart(cal, title):
     return QPixmap.fromImage(img)
 
 def _cal_without_outliers(cal):
-    """Возвращает копию cal только с принятыми точками (без выбросов)."""
     df_clean = cal["df"][cal["mask"]].reset_index(drop=True)
     from nk_analysis.core.math_engine import build_calibration
     pairs_clean = df_clean.rename(columns={"V": "V", "f": "f"})[["V", "f"]]

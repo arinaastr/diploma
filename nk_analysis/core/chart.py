@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
 def draw_scatter(ax, fig, cal, title="Градуировочная зависимость"):
-    """Рисует график на переданном ax."""
     df   = cal["df"]
     mask = cal["mask"]
     a0, a1, s_t = cal["a0"], cal["a1"], cal["S_T"]
@@ -36,14 +35,12 @@ def draw_scatter(ax, fig, cal, title="Градуировочная зависи�
     fig.tight_layout()
 
 def save_chart_to_temp(fig):
-    """Сохраняет фигуру во временный PNG, возвращает путь."""
     fd, path = tempfile.mkstemp(suffix=".png")
     os.close(fd)
     fig.savefig(path, dpi=150, bbox_inches="tight")
     return path
 
 def cleanup_temp(path):
-    """Удаляет временный файл."""
     try:
         if path and os.path.exists(path):
             os.remove(path)

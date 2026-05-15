@@ -8,11 +8,6 @@ from nk_analysis.utils.constants import (
 )
 
 def build_calibration(pairs):
-    """Строит регрессию f = a0 + a1*V с отбраковкой выбросов.
-
-    pairs — DataFrame с колонками V, f.
-    Возвращает dict или None если точек < MIN_PAIRS.
-    """
     df = pairs[["V", "f"]].copy()
     df["V"] = pd.to_numeric(df["V"], errors="coerce")
     df["f"] = pd.to_numeric(df["f"], errors="coerce")
@@ -72,7 +67,6 @@ def build_calibration(pairs):
             "mask": mask, "iters": iterations, "df": df}
 
 def get_beton_class(avg_strength):
-    """Класс бетона по средней прочности (ГОСТ 18105-2018)."""
     if avg_strength is None or (isinstance(avg_strength, float) and np.isnan(avg_strength)):
         return "—"
     for limit, cls in BETON_CLASSES:
@@ -81,7 +75,6 @@ def get_beton_class(avg_strength):
     return "B60+"
 
 def classify_strength(f_mpa):
-    """Цвет/статус одной точки прочности."""
     if f_mpa is None or (isinstance(f_mpa, float) and np.isnan(f_mpa)):
         return "—", BAD_BG, BAD_FG
     if f_mpa >= THRESHOLD_OK:
@@ -91,9 +84,7 @@ def classify_strength(f_mpa):
     return "Критично", BAD_BG, BAD_FG
 
 def calculate_strength(df, a0, a1):
-    """Добавляет к df колонки: f_расч МПа, Класс, Статус.
-    Если V есть — считаем по регрессии.
-    """
+
     result = df.copy()
     result["f_расч МПа"] = np.nan
     result["Класс"]      = "—"

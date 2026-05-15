@@ -46,16 +46,6 @@ def _add_table(doc, df, cols=None):
 
 def generate_docx(state, meta, include_chart=True,
                   include_stvol=True, include_ne=True):
-    """Генерирует Word-протокол.
-
-    state — словарь с ключами:
-        cal_s, cal_n   — результаты build_calibration (или None)
-        dc_stvol       — DataFrame с расчётными прочностями по стволу
-        dc_ne          — DataFrame с расчётными прочностями по не стволу
-
-    meta — словарь с реквизитами (num, obj, addr, date, period, dev, ntd,
-                                   age, cls, proj_cls, e1f, e1p, e2f, e2p)
-    """
     doc = Document()
 
     section = doc.sections[0]

@@ -50,7 +50,7 @@ class ImportPage(QWidget):
         root.setContentsMargins(0, 0, 0, 0)
         root.setSpacing(0)
 
-        # ── Прокручиваемая область ──────────────────────────────────
+        # Прокручиваемая область
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QScrollArea.Shape.NoFrame)
@@ -63,12 +63,12 @@ class ImportPage(QWidget):
         # Заголовок
         lay.addWidget(make_label("Импорт данных", big=True))
         lay.addWidget(make_label(
-            "Загрузите .xlsx файлы. Данные «Ствол» и «Не ствол» обрабатываются раздельно.",
+            "Загрузите .xlsx файлы. Данные «Ствол» и «Не ствол» обрабатываются раздельно",
             muted=True,
         ))
         lay.addSpacing(4)
 
-        # ── Карточка загрузки файлов ────────────────────────────────
+        # Карточка загрузки файлов
         file_card = QWidget()
         file_card.setStyleSheet(
             f"background:{SURFACE};border:none;border-radius:10px;"
@@ -79,7 +79,7 @@ class ImportPage(QWidget):
 
         fc_lay.addWidget(make_section_label("Файлы данных"))
 
-        # Синяя кнопка с иконкой (как в варианте 3)
+        # Синяя кнопка с иконкой
         self.btn_load = QPushButton("  Выбрать файлы…")
         self.btn_load.setFixedHeight(38)
         self.btn_load.setStyleSheet(
@@ -99,14 +99,14 @@ class ImportPage(QWidget):
 
         lay.addWidget(file_card)
 
-        # ── Реквизиты объекта ───────────────────────────────────────
+        # Реквизиты объекта
         lay.addWidget(make_section_label("Реквизиты объекта"))
 
         self.f_num    = QLineEdit(); self.f_num.setPlaceholderText("01/2026")
         self.f_obj    = QLineEdit(); self.f_obj.setPlaceholderText("Наименование объекта")
         self.f_addr   = QLineEdit(); self.f_addr.setPlaceholderText("Адрес")
         self.f_date   = QLineEdit(); self.f_date.setPlaceholderText("15.05.2026")
-        # Поле периода — клик открывает календарик
+        # Поле периода 
         self.f_period = _ClickableLineEdit("01.03.2026 – 31.03.2026", self._pick_period)
         self._period_widget = self.f_period
         self.f_dev    = QLineEdit(); self.f_dev.setPlaceholderText("Пульсар-1.1")
@@ -197,7 +197,6 @@ class ImportPage(QWidget):
     # ── Логика ──────────────────────────────────────────────────────
 
     def _pick_period(self):
-        """Диалог выбора периода обследования через два календаря."""
         dlg = QDialog(self)
         dlg.setWindowTitle("Выбор периода обследования")
         dlg.setMinimumWidth(520)

@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+from nk_analysis.ui.widgets import BottomBar
 
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QPushButton,
@@ -162,23 +163,12 @@ class ImportPage(QWidget):
         scroll.setWidget(inner)
         root.addWidget(scroll, stretch=1)
 
-        bottom = QWidget()
-        bottom.setFixedHeight(54)
-        bottom.setStyleSheet(
-            f"background:{WHITE};border-top:1px solid {BORDER};"
-        )
-        bl = QHBoxLayout(bottom)
-        bl.setContentsMargins(24, 8, 24, 8)
-        bl.addStretch()
-        btn_next = QPushButton("Далее →")
-        btn_next.setFixedSize(130, 36)
-        btn_next.setStyleSheet(
-            f"background:{NAVY};color:#FFFFFF;font-weight:600;"
-            f"border-radius:6px;font-size:13px;border:none;"
-        )
-        btn_next.clicked.connect(self._go_next)
-        bl.addWidget(btn_next)
-        root.addWidget(bottom)
+        scroll.setWidget(inner)
+        root.addWidget(scroll, stretch=1)
+        
+        bar = BottomBar(on_next=self._go_next)
+        bar.btn_back.setVisible(False)
+        root.addWidget(bar)
 
     def _pick_period(self):
         dlg = QDialog(self)

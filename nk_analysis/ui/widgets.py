@@ -62,7 +62,7 @@ BTN_BACK = (
 
 class BottomBar(QWidget):
     def __init__(self, on_back=None, on_next=None,
-                 back_text="← Назад", next_text="Далее →"):
+                 back_text="Назад", next_text="Далее"):
         super().__init__()
         self.setFixedHeight(54)
         self.setStyleSheet(

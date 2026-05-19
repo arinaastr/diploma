@@ -183,9 +183,9 @@ class WorkPage(QWidget):
 
         tabs = QTabWidget()
         self.block_s = _CalibBlock("Ствол",     "cal_s", "dc_stvol", state)
-        self.block_n = _CalibBlock("Не ствол",  "cal_n", "dc_ne",    state)
+        self.block_n = _CalibBlock("Конструкция",  "cal_n", "dc_ne",    state)
         tabs.addTab(self.block_s, "Ствол")
-        tabs.addTab(self.block_n, "Не ствол")
+        tabs.addTab(self.block_n, "Конструкция")
         lay.addWidget(tabs)
 
         scroll.setWidget(inner)
@@ -213,4 +213,4 @@ class WorkPage(QWidget):
         cols_n = ["Участок", "V", "f_МО", "f_расч МПа", "Класс", "Статус"]
 
         self.block_s.load(cal_s, ds, cols_s, "Градуировочная зависимость — Ствол")
-        self.block_n.load(cal_n, dn, cols_n, "Градуировочная зависимость — Не ствол")
+        self.block_n.load(cal_n, dn, cols_n, "Градуировочная зависимость — Конструкция")

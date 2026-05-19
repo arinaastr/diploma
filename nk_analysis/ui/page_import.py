@@ -155,7 +155,7 @@ class ImportPage(QWidget):
         self.tbl_s = QTableWidget(); setup_table(self.tbl_s)
         self.tbl_n = QTableWidget(); setup_table(self.tbl_n)
         tabs.addTab(self.tbl_s, "Ствол")
-        tabs.addTab(self.tbl_n, "Не ствол")
+        tabs.addTab(self.tbl_n, "Конструкция")
         tabs.setMinimumHeight(180)
         lay.addWidget(tabs)
         lay.addStretch()

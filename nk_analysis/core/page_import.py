@@ -50,7 +50,6 @@ class ImportPage(QWidget):
         root.setContentsMargins(0, 0, 0, 0)
         root.setSpacing(0)
 
-        # Прокручиваемая область
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QScrollArea.Shape.NoFrame)
@@ -60,15 +59,13 @@ class ImportPage(QWidget):
         lay.setContentsMargins(28, 20, 28, 16)
         lay.setSpacing(10)
 
-        # Заголовок
         lay.addWidget(make_label("Импорт данных", big=True))
         lay.addWidget(make_label(
-            "Загрузите .xlsx файлы. Данные «Ствол» и «Не ствол» обрабатываются раздельно",
+            "Загрузите .xlsx файлы. Данные «Ствол» и «Конструкция» обрабатываются раздельно",
             muted=True,
         ))
         lay.addSpacing(4)
 
-        # Карточка загрузки файлов
         file_card = QWidget()
         file_card.setStyleSheet(
             f"background:{SURFACE};border:none;border-radius:10px;"
@@ -79,7 +76,6 @@ class ImportPage(QWidget):
 
         fc_lay.addWidget(make_section_label("Файлы данных"))
 
-        # Синяя кнопка с иконкой
         self.btn_load = QPushButton("  Выбрать файлы…")
         self.btn_load.setFixedHeight(38)
         self.btn_load.setStyleSheet(
@@ -99,14 +95,12 @@ class ImportPage(QWidget):
 
         lay.addWidget(file_card)
 
-        # Реквизиты объекта
         lay.addWidget(make_section_label("Реквизиты объекта"))
 
         self.f_num    = QLineEdit(); self.f_num.setPlaceholderText("01/2026")
         self.f_obj    = QLineEdit(); self.f_obj.setPlaceholderText("Наименование объекта")
         self.f_addr   = QLineEdit(); self.f_addr.setPlaceholderText("Адрес")
         self.f_date   = QLineEdit(); self.f_date.setPlaceholderText("15.05.2026")
-        # Поле периода 
         self.f_period = _ClickableLineEdit("01.03.2026 – 31.03.2026", self._pick_period)
         self._period_widget = self.f_period
         self.f_dev    = QLineEdit(); self.f_dev.setPlaceholderText("Пульсар-1.1")
@@ -147,19 +141,17 @@ class ImportPage(QWidget):
         proj_row.addStretch()
         lay.addLayout(proj_row)
 
-        # ── Метрики ─────────────────────────────────────────────────
         lay.addSpacing(4)
         lay.addWidget(make_section_label("Данные в файлах"))
         mrow = QHBoxLayout(); mrow.setSpacing(8)
         m1, self.mv_files = make_metric("0",           "файлов")
         m2, self.mv_uzk   = make_metric("0",           "измерений УЗК")
-        m3, self.mv_pairs = make_metric("С:0 / НС:0",  "парных точек")
+        m3, self.mv_pairs = make_metric("С:0 / К:0",  "парных точек")
         m4, self.mv_horiz = make_metric("0",           "горизонтов")
         for m in [m1, m2, m3, m4]:
             mrow.addWidget(m)
         lay.addLayout(mrow)
 
-        # ── Предпросмотр ─────────────────────────────────────────────
         lay.addSpacing(4)
         lay.addWidget(make_section_label("Предпросмотр данных"))
         tabs = QTabWidget()
@@ -167,7 +159,7 @@ class ImportPage(QWidget):
         self.tbl_s = QTableWidget(); setup_table(self.tbl_s)
         self.tbl_n = QTableWidget(); setup_table(self.tbl_n)
         tabs.addTab(self.tbl_s, "Ствол")
-        tabs.addTab(self.tbl_n, "Не ствол")
+        tabs.addTab(self.tbl_n, "Конструкция")
         tabs.setMinimumHeight(180)
         lay.addWidget(tabs)
         lay.addStretch()
@@ -175,7 +167,6 @@ class ImportPage(QWidget):
         scroll.setWidget(inner)
         root.addWidget(scroll, stretch=1)
 
-        # ── Нижняя панель ────────────────────────────────────────────
         bottom = QWidget()
         bottom.setFixedHeight(54)
         bottom.setStyleSheet(
@@ -331,7 +322,7 @@ QCalendarWidget QSpinBox { color:#1C2B4A; background:#FFFFFF; font-size:13px; bo
         if len(ds): nuk += int(ds["V"].notna().sum())
         if len(dn): nuk += int(dn["V"].notna().sum())
         self.mv_uzk.setText(str(nuk))
-        self.mv_pairs.setText(f"С:{len(ps)} / НС:{len(pn)}")
+        self.mv_pairs.setText(f"С:{len(ps)} / К:{len(pn)}")
         self.mv_horiz.setText(str(ds["Горизонт"].nunique()) if len(ds) else "0")
         self.mv_files.setText(str(len(paths)))
         fill_table(self.tbl_s, ds.head(50) if len(ds) else pd.DataFrame())

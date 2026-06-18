@@ -57,7 +57,7 @@ class ImportPage(QWidget):
 
         lay.addWidget(make_label("Импорт данных", big=True))
         lay.addWidget(make_label(
-            "Загрузите .xlsx файлы. Данные «Ствол» и «Не ствол» обрабатываются раздельно.",
+            "Загрузите .xlsx файлы. Данные «Ствол» и «Конструкция» обрабатываются раздельно.",
             muted=True,
         ))
         lay.addSpacing(4)
@@ -142,7 +142,7 @@ class ImportPage(QWidget):
         mrow = QHBoxLayout(); mrow.setSpacing(8)
         m1, self.mv_files = make_metric("0",           "файлов")
         m2, self.mv_uzk   = make_metric("0",           "измерений УЗК")
-        m3, self.mv_pairs = make_metric("С:0 / НС:0",  "парных точек")
+        m3, self.mv_pairs = make_metric("С:0 / К:0",  "парных точек")
         m4, self.mv_horiz = make_metric("0",           "горизонтов")
         for m in [m1, m2, m3, m4]:
             mrow.addWidget(m)
@@ -303,7 +303,7 @@ QCalendarWidget QSpinBox { color: #1C2B4A; background: #FFFFFF; font-size:13px; 
         if len(ds): nuk += int(ds["V"].notna().sum())
         if len(dn): nuk += int(dn["V"].notna().sum())
         self.mv_uzk.setText(str(nuk))
-        self.mv_pairs.setText(f"С:{len(ps)} / НС:{len(pn)}")
+        self.mv_pairs.setText(f"С:{len(ps)} / К:{len(pn)}")
         self.mv_horiz.setText(str(ds["Горизонт"].nunique()) if len(ds) else "0")
         self.mv_files.setText(str(len(paths)))
         fill_table(self.tbl_s, ds.head(50) if len(ds) else pd.DataFrame())

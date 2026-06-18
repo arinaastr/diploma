@@ -58,7 +58,7 @@ class ExportPage(QWidget):
         lay.addWidget(make_section_label("Содержимое протокола"))
         self.chk_chart  = CheckBox("Включить графики")
         self.chk_stvol  = CheckBox("Результаты по стволу")
-        self.chk_ne     = CheckBox("Результаты по конструкциям (не ствол)")
+        self.chk_ne     = CheckBox("Результаты по конструкциям")
         self.chk_chart.setChecked(True)
         self.chk_stvol.setChecked(True)
         self.chk_ne.setChecked(True)

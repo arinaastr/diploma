@@ -65,7 +65,7 @@ class _CalibBlock(QWidget):
         lay.addWidget(self.lbl_formula)
 
         stats_row = QHBoxLayout()
-        for attr, caption in [("lbl_r2","R²"), ("lbl_r","r"), ("lbl_st","S_T, МПа"), ("lbl_cls","Класс бетона")]:
+        for attr, caption in [("lbl_a","a"), ("lbl_b","b"), ("lbl_st","S, МПа"), ("lbl_r","r"), ("lbl_sr","S/R"), ("lbl_cls","Класс бетона")]:
             card = QWidget()
             card.setStyleSheet(f"background:{SURFACE};border:1px solid {BORDER};border-radius:8px;")
             cl = QVBoxLayout(card)
@@ -78,6 +78,12 @@ class _CalibBlock(QWidget):
             setattr(self, attr, vl)
             stats_row.addWidget(card)
         lay.addLayout(stats_row)
+
+        self.lbl_invalid = QLabel("⚠ Градуировочная зависимость НЕ ДОПУСТИМА (r < 0.7 или S/R > 0.15). Контроль прочности по данной зависимости не допускается.")
+        self.lbl_invalid.setStyleSheet("color:#8B1A1A;font-size:12px;font-weight:600;background:#FDECEA;border-radius:6px;padding:6px 10px;")
+        self.lbl_invalid.setWordWrap(True)
+        self.lbl_invalid.setVisible(False)
+        lay.addWidget(self.lbl_invalid)
 
         self.chk_outliers = CheckBox("Убрать выбросы (пересчитать без них)")
         self.chk_outliers.setStyleSheet("font-size:12px;background:transparent;")
@@ -121,14 +127,23 @@ class _CalibBlock(QWidget):
         self._display(cal)
 
     def _display(self, cal):
-        self.lbl_formula.setText(f"f  =  {cal['a0']:.3f}  +  {cal['a1']:.5f} · V")
-        self.lbl_r2.setText(str(round(cal["R2"], 4)))
+        a0, a1 = cal["a0"], cal["a1"]
+        b_str = f"+ {a0:.3f}" if a0 >= 0 else f"- {abs(a0):.3f}"
+        self.lbl_formula.setText(f"R  =  {a1:.5f} · V  {b_str}")
+        self.lbl_a.setText(str(round(a1, 5)))
+        self.lbl_b.setText(str(round(a0, 3)))
         self.lbl_r.setText(str(round(cal["r"],  4)))
         self.lbl_st.setText(str(round(cal["S_T"], 3)))
+        sr = cal.get("sr", float("nan"))
+        self.lbl_sr.setText("—" if (sr != sr) else str(round(sr, 4)))  # NaN check
 
         sub = cal["df"][cal["mask"]]
-        rm = (cal["a0"] + cal["a1"] * sub["V"]).mean() if len(sub) else float("nan")
+        rm = (a0 + a1 * sub["V"]).mean() if len(sub) else float("nan")
         self.lbl_cls.setText(get_beton_class(rm))
+
+        # Показать предупреждение если зависимость недопустима
+        is_valid = cal.get("valid", True)
+        self.lbl_invalid.setVisible(not is_valid)
 
         px = _render_chart(cal, self._title)
         self.lbl_chart.setPixmap(

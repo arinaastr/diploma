@@ -276,6 +276,12 @@ QCalendarWidget QSpinBox { color: #1C2B4A; background: #FFFFFF; font-size:13px; 
             d1 = self._cal_start.selectedDate().toString("dd.MM.yyyy")
             d2 = self._cal_end.selectedDate().toString("dd.MM.yyyy")
             self.f_period.setText(f"{d1} – {d2}")
+            # Визуальная фиксация выбранного периода: подсветка поля
+            self.f_period.setStyleSheet(
+                f"border: 2px solid #1C2B4A; border-radius: 6px; "
+                f"background: #EEF3FA; color: #1C2B4A; "
+                f"font-size: 13px; padding: 4px 8px;"
+            )
 
     def _load_files(self):
         paths, _ = QFileDialog.getOpenFileNames(

@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
-def draw_scatter(ax, fig, cal, title="Градуировочная зависимость"):
+def draw_scatter(ax, fig, cal, title=""):
     df   = cal["df"]
     mask = cal["mask"]
     a0, a1, s_t = cal["a0"], cal["a1"], cal["S_T"]
@@ -23,13 +23,16 @@ def draw_scatter(ax, fig, cal, title="Градуировочная зависи�
     v_line = np.linspace(v_min - margin, v_max + margin, 200)
     f_line = a0 + a1 * v_line
 
-    ax.plot(v_line, f_line, color="#2C365A", linewidth=1.5, label=f"f = {a0:.3f} + {a1:.5f}·V")
+    b_str = f"+ {a0:.3f}" if a0 >= 0 else f"- {abs(a0):.3f}"
+    ax.plot(v_line, f_line, color="#2C365A", linewidth=1.5,
+            label=f"R = {a1:.5f}·V {b_str}")
     ax.fill_between(v_line, f_line - 2 * s_t, f_line + 2 * s_t,
-                    alpha=0.12, color="#2C365A", label=f"±2·S_T ({2*s_t:.2f} МПа)")
+                    alpha=0.12, color="#2C365A", label=f"±2·S ({2*s_t:.2f} МПа)")
 
-    ax.set_xlabel("Скорость УЗК V, м/с")
-    ax.set_ylabel("Прочность f, МПа")
-    ax.set_title(title)
+    ax.set_xlabel("Скорость ультразвука V, м/с")
+    ax.set_ylabel("R, МПа")
+    if title:
+        ax.set_title(title)
     ax.legend(fontsize=8)
     ax.grid(True, alpha=0.3)
     fig.tight_layout()

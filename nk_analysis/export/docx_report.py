@@ -13,7 +13,7 @@ from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 
 from nk_analysis.core.chart import draw_scatter, save_chart_to_temp, cleanup_temp
-from nk_analysis.core.math_engine import get_beton_class
+from nk_analysis.core.math_engine import get_beton_class, beton_class_index
 
 def _heading(doc, text, level=1):
     p = doc.add_paragraph(text)
@@ -84,22 +84,40 @@ def generate_docx(state, meta, include_chart=True,
         tbl.rows[i].cells[1].text = v
     doc.add_paragraph("")
 
-    if include_stvol:
-        _heading(doc, "2. Результаты по стволу")
-        cal_s = state.get("cal_s")
-        if cal_s:
+    def _write_cal_block(doc, cal, section_title, chart_title, iter_label, data_df, data_cols, include_chart):
+        _heading(doc, section_title)
+        if cal:
+            a0, a1 = cal["a0"], cal["a1"]
+            b_str = f"+ {a0:.3f}" if a0 >= 0 else f"- {abs(a0):.3f}"
             doc.add_paragraph(
-                f"Градуировочная зависимость: f = {cal_s['a0']:.3f} + {cal_s['a1']:.5f}·V"
+                f"Градуировочная зависимость: R = {a1:.5f}·V {b_str}"
             )
+            sr = cal.get("sr", float("nan"))
+            sr_str = "—" if (sr != sr) else f"{sr:.4f}"
             doc.add_paragraph(
-                f"R² = {cal_s['R2']:.4f},  r = {cal_s['r']:.4f},  S_T = {cal_s['S_T']:.3f} МПа"
+                f"a = {a1:.5f},  b = {a0:.3f},  S = {cal['S_T']:.3f} МПа,  "
+                f"r = {cal['r']:.4f},  S/R = {sr_str}"
             )
-            if cal_s["iters"]:
-                _heading(doc, "Итерации отбраковки (ствол)", level=2)
-                _add_table(doc, pd.DataFrame(cal_s["iters"]))
+            # Предупреждение о недопустимости зависимости
+            if not cal.get("valid", True):
+                p_warn = doc.add_paragraph(
+                    "ВНИМАНИЕ: Градуировочная зависимость НЕ ДОПУСТИМА "
+                    "(коэффициент корреляции r < 0.7 или S/R > 0.15). "
+                    "Контроль и оценка прочности по данной градуировочной зависимости не допускаются (ГОСТ 17624)."
+                )
+                p_warn.runs[0].bold = True
+                p_warn.runs[0].font.color.rgb = RGBColor(0x8B, 0x1A, 0x1A)
+
+            if cal["iters"]:
+                _heading(doc, f"Итерации отбраковки ({iter_label})", level=2)
+                _add_table(doc, pd.DataFrame(cal["iters"]))
             if include_chart:
+                # Заголовок графика — текстом вне изображения
+                p_chart_title = doc.add_paragraph(chart_title)
+                p_chart_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                p_chart_title.runs[0].bold = True
                 fig, ax = plt.subplots(figsize=(14, 5))
-                draw_scatter(ax, fig, cal_s, title="Градуировочная зависимость — Ствол")
+                draw_scatter(ax, fig, cal, title="")  # без заголовка внутри графика
                 tmp = save_chart_to_temp(fig)
                 plt.close(fig)
                 try:
@@ -107,40 +125,24 @@ def generate_docx(state, meta, include_chart=True,
                 finally:
                     cleanup_temp(tmp)
                 doc.add_paragraph("")
+        if data_df is not None and len(data_df):
+            _heading(doc, "Данные по элементам", level=2)
+            cols = [c for c in data_cols if c in data_df.columns]
+            _add_table(doc, data_df, cols)
+
+    if include_stvol:
         dc_s = state.get("dc_stvol", pd.DataFrame())
-        if len(dc_s):
-            _heading(doc, "Данные по стволу", level=2)
-            cols_s = [c for c in ["Горизонт", "Сторона", "V", "f_МО", "f_расч МПа", "Класс", "Статус"] if c in dc_s.columns]
-            _add_table(doc, dc_s, cols_s)
+        cols_s = ["Горизонт", "Сторона", "V", "f_МО", "f_расч МПа", "Класс", "Статус"]
+        _write_cal_block(doc, state.get("cal_s"), "2. Результаты по стволу",
+                         "Градуировочная зависимость — Ствол", "ствол",
+                         dc_s if len(dc_s) else None, cols_s, include_chart)
 
     if include_ne:
-        _heading(doc, "3. Результаты по конструкциям (не ствол)")
-        cal_n = state.get("cal_n")
-        if cal_n:
-            doc.add_paragraph(
-                f"Градуировочная зависимость: f = {cal_n['a0']:.3f} + {cal_n['a1']:.5f}·V"
-            )
-            doc.add_paragraph(
-                f"R² = {cal_n['R2']:.4f},  r = {cal_n['r']:.4f},  S_T = {cal_n['S_T']:.3f} МПа"
-            )
-            if cal_n["iters"]:
-                _heading(doc, "Итерации отбраковки (не ствол)", level=2)
-                _add_table(doc, pd.DataFrame(cal_n["iters"]))
-            if include_chart:
-                fig, ax = plt.subplots(figsize=(14, 5))
-                draw_scatter(ax, fig, cal_n, title="Градуировочная зависимость — Не ствол")
-                tmp = save_chart_to_temp(fig)
-                plt.close(fig)
-                try:
-                    doc.add_picture(tmp, width=Cm(14))
-                finally:
-                    cleanup_temp(tmp)
-                doc.add_paragraph("")
         dc_n = state.get("dc_ne", pd.DataFrame())
-        if len(dc_n):
-            _heading(doc, "Данные по конструкциям", level=2)
-            cols_n = [c for c in ["Участок", "V", "f_МО", "f_расч МПа", "Класс", "Статус"] if c in dc_n.columns]
-            _add_table(doc, dc_n, cols_n)
+        cols_n = ["Участок", "V", "f_МО", "f_расч МПа", "Класс", "Статус"]
+        _write_cal_block(doc, state.get("cal_n"), "3. Результаты по конструкциям (не ствол)",
+                         "Градуировочная зависимость — Конструкции", "конструкции",
+                         dc_n if len(dc_n) else None, cols_n, include_chart)
 
     _heading(doc, "4. Заключение")
 
@@ -168,10 +170,12 @@ def generate_docx(state, meta, include_chart=True,
 
     if fact_cls != "—":
         if proj_cls and proj_cls not in ("—", "", "— не указан —"):
-            if fact_cls == proj_cls:
-                verdict = f"Фактический класс бетона СООТВЕТСТВУЕТ проектному ({proj_cls})."
+            fi = beton_class_index(fact_cls)
+            pi = beton_class_index(proj_cls)
+            if fi >= pi:
+                verdict = f"Фактический класс бетона СООТВЕТСТВУЕТ проектному ({fact_cls} ≥ {proj_cls})."
             else:
-                verdict = f"Фактический класс бетона НЕ СООТВЕТСТВУЕТ проектному ({fact_cls} ≠ {proj_cls})."
+                verdict = f"Фактический класс бетона НЕ СООТВЕТСТВУЕТ проектному ({fact_cls} < {proj_cls})."
         else:
             verdict = f"По результатам обследования бетон имеет класс {fact_cls} (средняя прочность {rm_str} МПа)."
         p = doc.add_paragraph(verdict)

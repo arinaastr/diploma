@@ -53,9 +53,8 @@ def build_calibration(pairs):
         iterations.append({
             "Итерация": step + 1,
             "Точек": n,
-            "S_T МПа": round(s_t, 3),
+            "S, МПа": round(s_t, 3),
             "Выбросов": n_out,
-            "R²": round(r2, 4),
             "r": round(r_corr, 4),
         })
 
@@ -63,7 +62,14 @@ def build_calibration(pairs):
             break
         mask[sub[outliers].index] = False
 
+    # Проверка допустимости по ГОСТ 17624: r >= 0.7 и S/R <= 0.15
+    sub_final = df[mask]
+    f_mean_final = float(sub_final["f"].mean()) if len(sub_final) else float("nan")
+    sr_ratio = float(s_t / abs(f_mean_final)) if f_mean_final and f_mean_final != 0 else float("nan")
+    valid = bool(r_corr >= 0.7 and sr_ratio <= 0.15)
+
     return {"a0": a0, "a1": a1, "S_T": s_t, "R2": r2, "r": r_corr,
+            "sr": sr_ratio, "valid": valid,
             "mask": mask, "iters": iterations, "df": df}
 
 def get_beton_class(avg_strength):
@@ -73,6 +79,15 @@ def get_beton_class(avg_strength):
         if avg_strength <= limit * 1.15:
             return cls
     return "B60+"
+
+def beton_class_index(cls_name):
+    """Возвращает числовой индекс класса бетона для сравнения (выше = лучше)."""
+    for i, (_, cls) in enumerate(BETON_CLASSES):
+        if cls == cls_name:
+            return i
+    if cls_name == "B60+":
+        return len(BETON_CLASSES)
+    return -1  # неизвестный класс
 
 def classify_strength(f_mpa):
     if f_mpa is None or (isinstance(f_mpa, float) and np.isnan(f_mpa)):

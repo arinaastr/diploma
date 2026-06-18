@@ -98,7 +98,6 @@ def generate_docx(state, meta, include_chart=True,
                 f"a = {a1:.5f},  b = {a0:.3f},  S = {cal['S_T']:.3f} МПа,  "
                 f"r = {cal['r']:.4f},  S/R = {sr_str}"
             )
-            # Предупреждение о недопустимости зависимости
             if not cal.get("valid", True):
                 p_warn = doc.add_paragraph(
                     "ВНИМАНИЕ: Градуировочная зависимость НЕ ДОПУСТИМА "
@@ -112,12 +111,11 @@ def generate_docx(state, meta, include_chart=True,
                 _heading(doc, f"Итерации отбраковки ({iter_label})", level=2)
                 _add_table(doc, pd.DataFrame(cal["iters"]))
             if include_chart:
-                # Заголовок графика — текстом вне изображения
                 p_chart_title = doc.add_paragraph(chart_title)
                 p_chart_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
                 p_chart_title.runs[0].bold = True
                 fig, ax = plt.subplots(figsize=(14, 5))
-                draw_scatter(ax, fig, cal, title="")  # без заголовка внутри графика
+                draw_scatter(ax, fig, cal, title="")
                 try:
                     tmp = save_chart_to_temp(fig)
                 finally:

@@ -79,7 +79,7 @@ class _CalibBlock(QWidget):
             stats_row.addWidget(card)
         lay.addLayout(stats_row)
 
-        self.lbl_invalid = QLabel("⚠ Градуировочная зависимость НЕ ДОПУСТИМА (r < 0.7 или S/R > 0.15). Контроль прочности по данной зависимости не допускается.")
+        self.lbl_invalid = QLabel("ВНИМАНИЕ: Градуировочная зависимость НЕ ДОПУСТИМА (r < 0.7 или S/R > 0.15). Контроль прочности по данной зависимости не допускается.")
         self.lbl_invalid.setStyleSheet("color:#8B1A1A;font-size:12px;font-weight:600;background:#FDECEA;border-radius:6px;padding:6px 10px;")
         self.lbl_invalid.setWordWrap(True)
         self.lbl_invalid.setVisible(False)
@@ -137,7 +137,6 @@ class _CalibBlock(QWidget):
         rm = (a0 + a1 * sub["V"]).mean() if len(sub) else float("nan")
         self.lbl_cls.setText(get_beton_class(rm))
 
-        # Показать предупреждение если зависимость недопустима
         is_valid = cal.get("valid", True)
         self.lbl_invalid.setVisible(not is_valid)
 

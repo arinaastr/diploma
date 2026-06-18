@@ -85,13 +85,12 @@ def get_beton_class(avg_strength):
     return "B60+"
 
 def beton_class_index(cls_name):
-    """Возвращает числовой индекс класса бетона для сравнения (выше = лучше)."""
     for i, (_, cls) in enumerate(BETON_CLASSES):
         if cls == cls_name:
             return i
     if cls_name == "B60+":
         return len(BETON_CLASSES)
-    return -1  # неизвестный класс
+    return -1
 
 def classify_strength(f_mpa):
     if f_mpa is None or (isinstance(f_mpa, float) and np.isnan(f_mpa)):

@@ -323,7 +323,7 @@ QCalendarWidget QSpinBox { color:#1C2B4A; background:#FFFFFF; font-size:13px; bo
         self.state["pairs_ne"]    = pn
 
         names = ", ".join(os.path.basename(p) for p in paths)
-        self.lbl_files.setText(f"✓  {names}")
+        self.lbl_files.setText(f"  {names}")
         self.lbl_files.setStyleSheet(
             f"color:{OK_FG};font-size:12px;background:transparent;font-weight:500;"
         )

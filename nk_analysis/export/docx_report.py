@@ -84,7 +84,7 @@ def generate_docx(state, meta, include_chart=True,
         tbl.rows[i].cells[1].text = v
     doc.add_paragraph("")
 
-    def _write_cal_block(doc, cal, section_title, chart_title, iter_label, data_df, data_cols, include_chart):
+    def _write_cal_block(doc, cal, section_title, chart_title, iter_label, data_df, data_cols, include_chart, data_heading="Данные по элементам"):
         _heading(doc, section_title)
         if cal:
             a0, a1 = cal["a0"], cal["a1"]
@@ -118,15 +118,17 @@ def generate_docx(state, meta, include_chart=True,
                 p_chart_title.runs[0].bold = True
                 fig, ax = plt.subplots(figsize=(14, 5))
                 draw_scatter(ax, fig, cal, title="")  # без заголовка внутри графика
-                tmp = save_chart_to_temp(fig)
-                plt.close(fig)
+                try:
+                    tmp = save_chart_to_temp(fig)
+                finally:
+                    plt.close(fig)
                 try:
                     doc.add_picture(tmp, width=Cm(14))
                 finally:
                     cleanup_temp(tmp)
                 doc.add_paragraph("")
         if data_df is not None and len(data_df):
-            _heading(doc, "Данные по элементам", level=2)
+            _heading(doc, data_heading, level=2)
             cols = [c for c in data_cols if c in data_df.columns]
             _add_table(doc, data_df, cols)
 
@@ -135,14 +137,16 @@ def generate_docx(state, meta, include_chart=True,
         cols_s = ["Горизонт", "Сторона", "V", "f_МО", "f_расч МПа", "Класс", "Статус"]
         _write_cal_block(doc, state.get("cal_s"), "2. Результаты по стволу",
                          "Градуировочная зависимость — Ствол", "ствол",
-                         dc_s if len(dc_s) else None, cols_s, include_chart)
+                         dc_s if len(dc_s) else None, cols_s, include_chart,
+                         data_heading="Данные по стволу")
 
     if include_ne:
         dc_n = state.get("dc_ne", pd.DataFrame())
         cols_n = ["Участок", "V", "f_МО", "f_расч МПа", "Класс", "Статус"]
         _write_cal_block(doc, state.get("cal_n"), "3. Результаты по конструкциям (не ствол)",
                          "Градуировочная зависимость — Конструкции", "конструкции",
-                         dc_n if len(dc_n) else None, cols_n, include_chart)
+                         dc_n if len(dc_n) else None, cols_n, include_chart,
+                         data_heading="Данные по конструкциям")
 
     _heading(doc, "4. Заключение")
 
@@ -172,7 +176,9 @@ def generate_docx(state, meta, include_chart=True,
         if proj_cls and proj_cls not in ("—", "", "— не указан —"):
             fi = beton_class_index(fact_cls)
             pi = beton_class_index(proj_cls)
-            if fi >= pi:
+            if fi == -1 or pi == -1:
+                verdict = f"Фактический класс бетона: {fact_cls}. Сравнение с проектным ({proj_cls}) невозможно — неизвестный класс."
+            elif fi >= pi:
                 verdict = f"Фактический класс бетона СООТВЕТСТВУЕТ проектному ({fact_cls} ≥ {proj_cls})."
             else:
                 verdict = f"Фактический класс бетона НЕ СООТВЕТСТВУЕТ проектному ({fact_cls} < {proj_cls})."

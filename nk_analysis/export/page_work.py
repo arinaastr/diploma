@@ -120,10 +120,6 @@ class _CalibBlock(QWidget):
         else:
             cal = self._cal_original
         self._state[self._state_key_cal] = cal
-        if self._df_full is not None and len(self._df_full):
-            self._state[self._state_key_dc] = calculate_strength(
-                self._df_full, cal["a0"], cal["a1"]
-            )
         self._display(cal)
 
     def _display(self, cal):
@@ -157,6 +153,7 @@ class _CalibBlock(QWidget):
 
         if self._df_full is not None and len(self._df_full):
             dc = calculate_strength(self._df_full, cal["a0"], cal["a1"])
+            self._state[self._state_key_dc] = dc
             cols = [c for c in self._data_cols if c in dc.columns]
             fill_table(self.tbl_data, dc[cols])
 

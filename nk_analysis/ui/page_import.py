@@ -163,9 +163,6 @@ class ImportPage(QWidget):
         scroll.setWidget(inner)
         root.addWidget(scroll, stretch=1)
 
-        scroll.setWidget(inner)
-        root.addWidget(scroll, stretch=1)
-        
         bar = BottomBar(on_next=self._go_next)
         bar.btn_back.setVisible(False)
         root.addWidget(bar)

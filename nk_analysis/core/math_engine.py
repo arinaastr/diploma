@@ -1,3 +1,4 @@
+import math
 import numpy as np
 import pandas as pd
 
@@ -65,8 +66,11 @@ def build_calibration(pairs):
     # Проверка допустимости по ГОСТ 17624: r >= 0.7 и S/R <= 0.15
     sub_final = df[mask]
     f_mean_final = float(sub_final["f"].mean()) if len(sub_final) else float("nan")
-    sr_ratio = float(s_t / abs(f_mean_final)) if f_mean_final and f_mean_final != 0 else float("nan")
-    valid = bool(r_corr >= 0.7 and sr_ratio <= 0.15)
+    if not math.isnan(f_mean_final) and f_mean_final != 0:
+        sr_ratio = float(s_t / abs(f_mean_final))
+    else:
+        sr_ratio = float("nan")
+    valid = bool(r_corr >= 0.7 and not math.isnan(sr_ratio) and sr_ratio <= 0.15)
 
     return {"a0": a0, "a1": a1, "S_T": s_t, "R2": r2, "r": r_corr,
             "sr": sr_ratio, "valid": valid,

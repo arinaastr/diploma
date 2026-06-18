@@ -66,7 +66,7 @@ class _CalibBlock(QWidget):
         stats_row = QHBoxLayout()
         for attr, caption in [("lbl_a","a"), ("lbl_b","b"), ("lbl_st","S, МПа"), ("lbl_r","r"), ("lbl_sr","S/R"), ("lbl_cls","Класс бетона")]:
             card = QWidget()
-            card.setStyleSheet("background:transparent;")
+            card.setStyleSheet(f"background:{SURFACE};border:none;border-radius:8px;")
             cl = QVBoxLayout(card)
             cl.setContentsMargins(10, 6, 10, 6)
             vl = QLabel("—")
